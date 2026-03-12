@@ -14,7 +14,17 @@ async function getArticles(): Promise<ProcessedArticle[]> {
     console.error('Supabase error:', error)
     return []
   }
-  return data || []
+
+  // Filtro duplikatët sipas title_sq
+  const seen = new Set<string>()
+  const unique = (data || []).filter((article) => {
+    const key = article.title_sq?.toLowerCase().trim() || ''
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
+
+  return unique
 }
 
 async function getStats() {
